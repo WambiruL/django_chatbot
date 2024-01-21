@@ -10,15 +10,18 @@ openai_api_key='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'
 openai.api_key=openai_api_key
 
 def ask_openai(message):
-    response=openai.completions.create(
-        model="gpt-3.5-turbo-instruct",
-        prompt=message,
-        max_tokens=150,
-        stop=None,
-        temperature=0.7,
+    response=openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        message=[
+            {'role':"system", "content": "You are a helpful assistant"},
+            {'role':"user", "content": message},
+        ]
+        # max_tokens=150,
+        # stop=None,
+        # temperature=0.7,
     )
     print(response)
-    answer=response.choice[0].text.strip()
+    answer=response.choice[0].message.content.strip()
     return answer
 
 # Create your views here.
