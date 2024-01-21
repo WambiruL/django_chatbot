@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 import openai
 from django.contrib import auth
 from django.contrib.auth.models import User
+from .models import Chat
+from django.utils import timezone
 
 openai_api_key='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'
 openai.api_key=openai_api_key
@@ -21,11 +23,16 @@ def ask_openai(message):
 
 # Create your views here.
 def chatbot(request):
+    chats=Chat.objects.filter(user=request.user)
+
     if request.method=='POST':
         message=request.POST.get('message')
         response= ask_openai(message)
+
+        chat=Chat(user=request.user, message=message, response=response, created_at=timezone.now())
+        chat.save()
         return JsonResponse({'message':message, 'response':response})
-    return render(request, 'chatbot.html') #to show which file to render in the frontend
+    return render(request, 'chatbot.html', {'chats':chats}) #to show which file to render in the frontend
 
 def login(request):
     if request.method=='POST':
